@@ -1,0 +1,2 @@
+- [Dev port 3002](../../../.claude/memory/feedback_port.md) — Use port 3002, 3000 is occupied
+- [Pricing: 30% margin](project_pricing.md) — Show Syscom prices + 30% margin to end users, not hidden

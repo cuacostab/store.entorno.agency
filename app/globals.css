@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #1090e0;
+  --brand-hover: #0e7fcb;
+  --brand-dark: #0b6ab3;
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
+  --success: #10b981;
+
+  --bg-light: #f2f3f5;
+  --footer: #1e293b;
+
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --white: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+
+  --r-card: 16px;
+  --r-btn: 10px;
+
+  --shadow-card: 0 10px 30px rgba(17, 24, 39, 0.08);
+  --navbar-bg: rgba(255, 255, 255, 0.85);
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, sans-serif;
+  background: var(--white);
+  color: var(--text);
+}
+
+::selection { background: rgba(16, 144, 224, 0.25); }
+
+/* ─── Navbar ─────────────────────────────────── */
+.navbar-bg {
+  background: var(--navbar-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ─── Container ──────────────────────────────── */
+.container6 {
+  margin: 0 auto;
+  max-width: 72rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (min-width: 640px) {
+  .container6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+}
+
+/* ─── Animations ─────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .anim-reveal, .anim-stagger-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+.anim-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-reveal.anim-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.anim-stagger-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-stagger-item.anim-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Hover glow ─────────────────────────────── */
+.anim-hover-glow {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s ease;
+}
+.anim-hover-glow:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--brand) 15%, transparent),
+              0 4px 12px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* ─── Chat markdown ──────────────────────────── */
+.chat-msg p { margin: 2px 0; }
+.chat-msg strong { font-weight: 700; }
+.chat-msg em { font-style: italic; opacity: 0.85; }
+.chat-msg ul { margin: 4px 0; padding-left: 1.1em; list-style: disc; }
+.chat-msg li { margin: 1px 0; }
+.chat-msg a { color: var(--brand); text-decoration: underline; }
+.chat-msg br { display: block; content: ""; margin-top: 4px; }
+
+/* ─── Stock badges ───────────────────────────── */
+.badge-disponible { background: #dcfce7; color: #166534; }
+.badge-bajo { background: #fef3c7; color: #92400e; }
+.badge-agotado { background: #fecaca; color: #991b1b; }
