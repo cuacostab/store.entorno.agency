@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useCart } from "@/lib/cart-context";
 
 const links = [
   { href: "/", label: "Inicio" },
@@ -12,6 +13,7 @@ const links = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { totalItems, open: openCart } = useCart();
 
   return (
     <nav className="navbar-bg fixed top-0 left-0 right-0 z-50 border-b border-gray-200/60">
@@ -31,6 +33,19 @@ export function Navbar() {
               {l.label}
             </Link>
           ))}
+
+          <button onClick={openCart} className="relative p-2 text-gray-600 hover:text-gray-900 transition" aria-label="Carrito">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-white rounded-full px-1" style={{ background: "var(--accent)" }}>
+                {totalItems}
+              </span>
+            )}
+          </button>
+
           <Link
             href="/contacto"
             className="text-sm font-semibold text-white px-4 py-2 rounded-btn transition"
@@ -40,12 +55,25 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile toggle */}
-        <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="Menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            {open ? <path d="M18 6L6 18M6 6l12 12" /> : <><path d="M3 12h18" /><path d="M3 6h18" /><path d="M3 18h18" /></>}
-          </svg>
-        </button>
+        {/* Mobile: cart + toggle */}
+        <div className="flex md:hidden items-center gap-2">
+          <button onClick={openCart} className="relative p-2 text-gray-600" aria-label="Carrito">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-white rounded-full px-1" style={{ background: "var(--accent)" }}>
+                {totalItems}
+              </span>
+            )}
+          </button>
+          <button className="p-2" onClick={() => setOpen(!open)} aria-label="Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              {open ? <path d="M18 6L6 18M6 6l12 12" /> : <><path d="M3 12h18" /><path d="M3 6h18" /><path d="M3 18h18" /></>}
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}

@@ -12,6 +12,7 @@ type ProductCard = {
   img_portada: string;
   stock: "disponible" | "agotado" | "bajo";
   link: string;
+  precio?: number;
   precio_formato?: string;
 };
 

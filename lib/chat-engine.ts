@@ -16,6 +16,7 @@ export type ProductCardData = {
   img_portada: string;
   stock: "disponible" | "agotado" | "bajo";
   link: string;
+  precio: number;
   precio_formato: string;
 };
 
@@ -100,6 +101,7 @@ function toCardData(p: Product | ProductDetail): ProductCardData {
     img_portada: p.img_portada,
     stock: p.stock,
     link: `/productos/${p.producto_id}`,
+    precio: p.precio,
     precio_formato: p.precio_formato,
   };
 }

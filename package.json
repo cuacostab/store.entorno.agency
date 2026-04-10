@@ -9,23 +9,24 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "mercadopago": "^2.12.0",
     "next": "^15.3.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "nodemailer": "^6.10.1",
     "openai": "^4.85.4",
-    "nodemailer": "^6.10.1"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.14.1",
+    "@types/nodemailer": "^6.4.17",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.2",
-    "@types/nodemailer": "^6.4.17",
-    "typescript": "^5.8.3",
-    "tailwindcss": "^3.4.17",
-    "postcss": "^8.5.3",
     "autoprefixer": "^10.4.21",
-    "@tailwindcss/typography": "^0.5.16",
     "eslint": "^9.25.0",
-    "eslint-config-next": "^15.3.1"
+    "eslint-config-next": "^15.3.1",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3"
   }
 }

@@ -8,7 +8,7 @@ import type {
 } from "./syscom-types";
 import { getExchangeRate } from "./syscom-client";
 
-const MARGIN = 0.30; // 30% de margen sobre precio Syscom
+const MARGIN = 0.35; // 35% de margen (cubre comisión MercadoPago ~4%)
 
 function stockLabel(qty: number): "disponible" | "agotado" | "bajo" {
   if (qty <= 0) return "agotado";
@@ -16,40 +16,40 @@ function stockLabel(qty: number): "disponible" | "agotado" | "bajo" {
   return "disponible";
 }
 
-function applyMargin(usdPrice: string | number, exchangeRate: number): { precio: number; precio_formato: string } {
-  const raw = typeof usdPrice === "string" ? parseFloat(usdPrice) : usdPrice;
-  if (!raw || isNaN(raw) || raw <= 0) {
+/**
+ * Precios de Syscom API están en USD.
+ * Nuestro costo = precio_descuento (USD) × tipo_cambio = MXN sin IVA
+ * Precio de venta = costo × (1 + MARGIN) × 1.16 (IVA) = precio final IVA incluido
+ * El precio que se muestra y se cobra ya incluye IVA.
+ */
+function calcPrice(precios: SyscomProduct["precios"], fx: number): { precio: number; precio_formato: string } {
+  const descuento = parseFloat(precios?.precio_descuento ?? "0");
+
+  if (!descuento || isNaN(descuento) || descuento <= 0) {
     return { precio: 0, precio_formato: "Consultar precio" };
   }
-  const mxn = raw * exchangeRate;
-  const final = Math.ceil(mxn * (1 + MARGIN) * 100) / 100;
-  const formatted = final.toLocaleString("es-MX", {
+
+  const costoMxn = descuento * fx;
+  const ventaConIva = Math.ceil(costoMxn * (1 + MARGIN) * 1.16 * 100) / 100;
+
+  const formatted = ventaConIva.toLocaleString("es-MX", {
     style: "currency",
     currency: "MXN",
     minimumFractionDigits: 2,
   });
-  return { precio: final, precio_formato: `${formatted} MXN` };
-}
 
-function bestPrice(precios: SyscomProduct["precios"]): string {
-  const especial = parseFloat(precios?.precio_especial ?? "0");
-  const descuento = parseFloat(precios?.precio_descuento ?? "0");
-  const lista = parseFloat(precios?.precio_lista ?? "0");
-
-  if (especial > 0) return precios.precio_especial;
-  if (descuento > 0) return precios.precio_descuento;
-  return precios.precio_lista ?? "0";
+  return { precio: ventaConIva, precio_formato: `${formatted} MXN` };
 }
 
 function transformProduct(p: SyscomProduct, fx: number): Product {
   const { precios, ...rest } = p;
-  const { precio, precio_formato } = applyMargin(bestPrice(precios), fx);
+  const { precio, precio_formato } = calcPrice(precios, fx);
   return { ...rest, stock: stockLabel(p.total_existencia), precio, precio_formato };
 }
 
 function transformProductDetail(p: SyscomProductDetail, fx: number): ProductDetail {
   const { precios, ...rest } = p;
-  const { precio, precio_formato } = applyMargin(bestPrice(precios), fx);
+  const { precio, precio_formato } = calcPrice(precios, fx);
   return { ...rest, stock: stockLabel(p.total_existencia), precio, precio_formato };
 }
 

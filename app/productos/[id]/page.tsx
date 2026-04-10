@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getProduct } from "@/lib/syscom-client";
 import { stripProductDetail } from "@/lib/strip-prices";
+import { AddToCartButton } from "@/components/products/AddToCartButton";
 import type { Metadata } from "next";
 
 export const revalidate = 3600; // ISR: 1 hour
@@ -57,6 +58,7 @@ export default async function ProductDetailPage({ params }: Props) {
         Volver al catálogo
       </Link>
 
+      {/* Top section: image + info + actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
         {/* Images */}
         <div className="space-y-4">
@@ -87,7 +89,7 @@ export default async function ProductDetailPage({ params }: Props) {
           )}
         </div>
 
-        {/* Details */}
+        {/* Info + Actions */}
         <div>
           <div className="flex items-start gap-3 mb-2">
             {product.marca_logo?.trim() && (
@@ -112,65 +114,78 @@ export default async function ProductDetailPage({ params }: Props) {
             </span>
           </div>
           {product.precio > 0 && (
-            <p className="text-xs text-gray-400 mt-1">Precio antes de IVA</p>
+            <p className="text-xs text-gray-400 mt-1">IVA incluido</p>
           )}
 
-          {product.descripcion && (
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Descripción</h3>
-              <div
-                className="prose prose-sm max-w-none text-gray-600 leading-relaxed
-                  [&_table]:w-full [&_table]:text-xs [&_table]:border-collapse
-                  [&_td]:border [&_td]:border-gray-200 [&_td]:px-2 [&_td]:py-1
-                  [&_th]:border [&_th]:border-gray-200 [&_th]:px-2 [&_th]:py-1 [&_th]:bg-gray-50 [&_th]:font-semibold
-                  [&_tr:nth-child(even)]:bg-gray-50/50
-                  [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg
-                  [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
-                  [&_a]:text-blue-600 [&_a]:underline
-                  [&_p]:mb-2 [&_br]:block [&_br]:mb-1"
-                dangerouslySetInnerHTML={{ __html: product.descripcion }}
-              />
-            </div>
-          )}
-
-          {product.caracteristicas && product.caracteristicas.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Características</h3>
-              <ul className="space-y-1.5">
-                {product.caracteristicas.map((c, i) => (
-                  <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
-                    <span className="text-blue-500 mt-0.5">•</span>
-                    <span>{c}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {product.recursos && product.recursos.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Recursos</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.recursos.map((r, i) => (
-                  <a key={i} href={r.path} target="_blank" rel="noopener noreferrer" className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
-                    📄 {r.recurso}
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-8 pt-6 border-t border-gray-100">
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            {product.precio > 0 && product.stock !== "agotado" && (
+              <AddToCartButton product={{
+                producto_id: product.producto_id,
+                titulo: product.titulo,
+                modelo: product.modelo,
+                marca: product.marca,
+                img_portada: product.img_portada,
+                precio: product.precio,
+                precio_formato: product.precio_formato,
+              }} />
+            )}
             <Link
               href={`/contacto?producto=${encodeURIComponent(product.modelo)}`}
-              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold text-white rounded-btn transition hover:opacity-90"
-              style={{ background: "var(--brand)" }}
+              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold rounded-btn transition hover:opacity-90"
+              style={{ border: "1px solid var(--brand)", color: "var(--brand)" }}
             >
               Solicitar Cotización
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Bottom section: description, specs, resources — full width below images */}
+      <div className="mt-10 max-w-4xl">
+        {product.descripcion && (
+          <div className="mb-8">
+            <h3 className="text-base font-semibold text-gray-800 mb-3">Descripción</h3>
+            <div
+              className="prose prose-sm max-w-none text-gray-600 leading-relaxed
+                [&_table]:w-full [&_table]:text-xs [&_table]:border-collapse
+                [&_td]:border [&_td]:border-gray-200 [&_td]:px-2 [&_td]:py-1
+                [&_th]:border [&_th]:border-gray-200 [&_th]:px-2 [&_th]:py-1 [&_th]:bg-gray-50 [&_th]:font-semibold
+                [&_tr:nth-child(even)]:bg-gray-50/50
+                [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg
+                [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5
+                [&_a]:text-blue-600 [&_a]:underline
+                [&_p]:mb-2 [&_br]:block [&_br]:mb-1"
+              dangerouslySetInnerHTML={{ __html: product.descripcion }}
+            />
+          </div>
+        )}
+
+        {product.caracteristicas && product.caracteristicas.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-base font-semibold text-gray-800 mb-3">Características</h3>
+            <ul className="space-y-1.5">
+              {product.caracteristicas.map((c, i) => (
+                <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
+                  <span className="text-blue-500 mt-0.5">•</span>
+                  <span>{c}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {product.recursos && product.recursos.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-base font-semibold text-gray-800 mb-3">Recursos</h3>
+            <div className="flex flex-wrap gap-2">
+              {product.recursos.map((r, i) => (
+                <a key={i} href={r.path} target="_blank" rel="noopener noreferrer" className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                  📄 {r.recurso}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

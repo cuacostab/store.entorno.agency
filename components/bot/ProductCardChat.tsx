@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useCart } from "@/lib/cart-context";
 
 type Props = {
   product: {
@@ -10,6 +11,7 @@ type Props = {
     stock: "disponible" | "agotado" | "bajo";
     link: string;
     precio_formato?: string;
+    precio?: number;
   };
 };
 
@@ -21,6 +23,23 @@ const stockLabels = {
 
 export function ProductCardChat({ product }: Props) {
   const s = stockLabels[product.stock];
+  const { addItem } = useCart();
+
+  const canAddToCart = product.precio && product.precio > 0 && product.stock !== "agotado";
+
+  function handleAdd(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!canAddToCart) return;
+    addItem({
+      producto_id: product.producto_id,
+      titulo: product.titulo,
+      modelo: product.modelo,
+      marca: product.marca,
+      img_portada: product.img_portada,
+      precio: product.precio!,
+      precio_formato: product.precio_formato ?? "",
+    });
+  }
 
   return (
     <div style={{ background: "#fff", borderRadius: 12, overflow: "hidden", border: "1px solid #e5e7eb", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
@@ -50,17 +69,19 @@ export function ProductCardChat({ product }: Props) {
         </div>
       </div>
       <div style={{ display: "flex", gap: 6, padding: "6px 10px 10px", borderTop: "1px solid #f3f4f6" }}>
+        {canAddToCart ? (
+          <button
+            onClick={handleAdd}
+            style={{ flex: 1, textAlign: "center", fontSize: 11, fontWeight: 600, padding: "6px 0", borderRadius: 8, background: "var(--accent)", color: "#fff", border: "none", cursor: "pointer" }}
+          >
+            Agregar al carrito
+          </button>
+        ) : null}
         <Link
           href={product.link}
           style={{ flex: 1, textAlign: "center", fontSize: 11, fontWeight: 600, padding: "6px 0", borderRadius: 8, background: "var(--brand)", color: "#fff", textDecoration: "none" }}
         >
           Ver detalle
-        </Link>
-        <Link
-          href={`/contacto?producto=${encodeURIComponent(product.modelo)}`}
-          style={{ flex: 1, textAlign: "center", fontSize: 11, fontWeight: 600, padding: "6px 0", borderRadius: 8, border: "1px solid var(--brand)", color: "var(--brand)", textDecoration: "none" }}
-        >
-          Cotizar
         </Link>
       </div>
     </div>

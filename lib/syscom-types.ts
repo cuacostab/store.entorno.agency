@@ -29,9 +29,11 @@ export type SyscomBrandDetail = {
 };
 
 export type SyscomProductPrices = {
+  precio_1: string;
   precio_especial: string;
   precio_descuento: string;
   precio_lista: string;
+  volumen?: Record<string, string>;
 };
 
 export type SyscomProduct = {
