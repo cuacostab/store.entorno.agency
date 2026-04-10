@@ -1,42 +1,16 @@
 "use client";
 
 import { useCart } from "@/lib/cart-context";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export function CartDrawer() {
   const { items, removeItem, updateQuantity, clearCart, totalItems, totalPriceFormatted, isOpen, close } = useCart();
-  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  async function handleCheckout() {
-    if (items.length === 0) return;
-    setLoading(true);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: items.map(i => ({
-            product_id: i.producto_id,
-            title: i.titulo,
-            description: `${i.marca} — ${i.modelo}`,
-            picture_url: i.img_portada?.trim() || undefined,
-            quantity: i.quantity,
-            unit_price: i.precio,
-          })),
-        }),
-      });
-      const data = await res.json();
-      if (data.init_point) {
-        window.location.href = data.init_point;
-      } else {
-        alert(data.error || "Error al crear el pago");
-      }
-    } catch {
-      alert("Error de conexión. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
+  function goToCheckout() {
+    close();
+    router.push("/checkout/form");
   }
 
   if (!isOpen) return null;
@@ -115,12 +89,11 @@ export function CartDrawer() {
             </div>
             <p className="text-xs text-gray-400">IVA incluido</p>
             <button
-              onClick={handleCheckout}
-              disabled={loading}
-              className="w-full py-3 text-sm font-semibold text-white rounded-btn transition hover:opacity-90 disabled:opacity-50"
+              onClick={goToCheckout}
+              className="w-full py-3 text-sm font-semibold text-white rounded-btn transition hover:opacity-90"
               style={{ background: "var(--accent)" }}
             >
-              {loading ? "Procesando..." : "Pagar con MercadoPago"}
+              Finalizar compra
             </button>
             <button
               onClick={clearCart}

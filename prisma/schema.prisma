@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String     @id @default(uuid())
+  email       String     @unique
+  password    String
+  name        String
+  role        String     @default("viewer") // "admin" | "viewer"
+  isActive    Boolean    @default(true)
+  lastLoginAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  orders      Order[]    @relation("ProcessedBy")
+  leads       Lead[]     @relation("AssignedTo")
+  auditLogs   AuditLog[]
+}
+
+model Order {
+  id              String   @id @default(uuid())
+  mercadoPagoId   String?  @unique
+  preferenceId    String?
+  status          String   @default("pending") // pending | approved | rejected | in_process | refunded
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+  shippingAddress String?  // JSON: { street, extNum, intNum, neighborhood, city, state, zip }
+  items           String   // JSON array of cart items
+  subtotal        Float
+  total           Float
+  currency        String   @default("MXN")
+  paymentMethod   String?
+  paymentStatus   String?
+  notes           String?
+  processedById   String?
+  processedBy     User?    @relation("ProcessedBy", fields: [processedById], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Lead {
+  id            String   @id @default(uuid())
+  name          String
+  email         String?
+  phone         String?
+  source        String   @default("bot") // bot | contact_form | checkout
+  status        String   @default("new") // new | contacted | quoted | converted | lost
+  notes         String?
+  productsShown String?  // JSON array
+  conversation  String?  // JSON
+  sessionId     String?
+  assignedToId  String?
+  assignedTo    User?    @relation("AssignedTo", fields: [assignedToId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entityType String?
+  entityId   String?
+  metadata   String? // JSON
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}

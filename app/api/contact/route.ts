@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sendContactNotification } from "@/lib/mailer";
+import { db } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
@@ -15,7 +16,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email inválido" }, { status: 400 });
     }
 
+    // Persist lead in DB
+    await db.lead.create({
+      data: {
+        name,
+        email,
+        phone: phone ?? null,
+        source: "contact_form",
+        productsShown: products ? JSON.stringify([products]) : null,
+        notes: message,
+      },
+    });
+
+    // Send email notification
     await sendContactNotification({ name, email, phone: phone ?? "", message, products: products ?? "" });
+
     return NextResponse.json({ success: true, message: "Mensaje enviado correctamente" });
   } catch (err) {
     console.error("Contact form error:", err);
