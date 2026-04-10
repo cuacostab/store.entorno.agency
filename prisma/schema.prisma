@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["store"]
 }
 
 model User {
@@ -12,7 +14,7 @@ model User {
   email       String     @unique
   password    String
   name        String
-  role        String     @default("viewer") // "admin" | "viewer"
+  role        String     @default("viewer")
   isActive    Boolean    @default(true)
   lastLoginAt DateTime?
   createdAt   DateTime   @default(now())
@@ -20,18 +22,20 @@ model User {
   orders      Order[]    @relation("ProcessedBy")
   leads       Lead[]     @relation("AssignedTo")
   auditLogs   AuditLog[]
+
+  @@schema("store")
 }
 
 model Order {
   id              String   @id @default(uuid())
   mercadoPagoId   String?  @unique
   preferenceId    String?
-  status          String   @default("pending") // pending | approved | rejected | in_process | refunded
+  status          String   @default("pending")
   customerName    String
   customerEmail   String
   customerPhone   String?
-  shippingAddress String?  // JSON: { street, extNum, intNum, neighborhood, city, state, zip }
-  items           String   // JSON array of cart items
+  shippingAddress String?
+  items           String
   subtotal        Float
   total           Float
   currency        String   @default("MXN")
@@ -42,6 +46,8 @@ model Order {
   processedBy     User?    @relation("ProcessedBy", fields: [processedById], references: [id])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@schema("store")
 }
 
 model Lead {
@@ -49,16 +55,18 @@ model Lead {
   name          String
   email         String?
   phone         String?
-  source        String   @default("bot") // bot | contact_form | checkout
-  status        String   @default("new") // new | contacted | quoted | converted | lost
+  source        String   @default("bot")
+  status        String   @default("new")
   notes         String?
-  productsShown String?  // JSON array
-  conversation  String?  // JSON
+  productsShown String?
+  conversation  String?
   sessionId     String?
   assignedToId  String?
   assignedTo    User?    @relation("AssignedTo", fields: [assignedToId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@schema("store")
 }
 
 model AuditLog {
@@ -68,7 +76,9 @@ model AuditLog {
   action     String
   entityType String?
   entityId   String?
-  metadata   String? // JSON
+  metadata   String?
   ipAddress  String?
   createdAt  DateTime @default(now())
+
+  @@schema("store")
 }
